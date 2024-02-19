@@ -745,6 +745,16 @@ class _YahooFinance(object):
                 "count": {"required": False, "default": 25},
             },
         },
+        "customscreener": {
+            "path": "https://query2.finance.yahoo.com/v1/finance/screener/saved",
+            "response_field": "finance",
+            "query": {
+                "formatted": {"required": False, "default": False},
+                "scrIds": {"required": True, "default": None},
+                "userId": {"required": True, "default": None},
+                "count": {"required": False, "default": 25},
+            },
+        },
         "company360": {
             "path": "https://query2.finance.yahoo.com/ws/finance-company-360/v1/finance/premium/company360",
             "response_field": "finance",
@@ -1000,6 +1010,8 @@ class _YahooFinance(object):
         if _has_selenium:
             instance = YahooFinanceHeadless(self.username, self.password)
             instance.login()
+            print(f"\ninstance user id: {instance.userId}\n")
+            self.userId = instance.userId
             if instance.cookies:
                 self.session.cookies = instance.cookies
                 return

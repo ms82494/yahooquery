@@ -1,8 +1,8 @@
 # stdlib
 import re
 
-from .base import _YahooFinance
-from .utils.screeners import SCREENERS
+from yahooquery.base import _YahooFinance
+from yahooquery.utils.screeners import SCREENERS
 
 try:
     # stdlib
@@ -37,7 +37,10 @@ class Screener(_YahooFinance):
             k: str(v).lower() if v is True or v is False else v
             for k, v in new_params.items()
         }
-        return [dict(new_params, scrIds=scrId) for scrId in params["scrIds"]]
+        res = [dict(new_params, scrIds=scrId) for scrId in params["scrIds"]]
+        print(res)
+        return res
+        # return [dict(new_params, scrIds=scrId) for scrId in params["scrIds"]]
 
     def _construct_urls(self, config, params):
         return [self.session.get(url=config["path"], params=p) for p in params]

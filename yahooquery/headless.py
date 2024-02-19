@@ -1,5 +1,7 @@
 # stdlib
 from typing import Dict, List
+import json
+import re
 
 # third party
 from requests.cookies import RequestsCookieJar
@@ -47,6 +49,7 @@ class YahooFinanceHeadless:
             password_element.send_keys(self.password)
             self.driver.find_element(By.XPATH, "//button[@id='login-signin']").click()
             cookies = self.driver.get_cookies()
+            self._get_user_data()
             self.driver.quit()
             self._add_cookies_to_jar(cookies)
 
@@ -66,3 +69,19 @@ class YahooFinanceHeadless:
                 "expires": None,  # You can set the expiration if available
             }
             self.cookies.set(**cookie_dict)
+
+    def _get_user_data(self):
+        page_source = self.driver.page_source
+        
+        pattern = r"(?<=\n)(window\.YAHOO\.context.*?\n\s*};)"
+        match = re.search(pattern, page_source, re.DOTALL)
+
+        if match:
+            yContextStr = match.group(0).replace("window.YAHOO.context =", "").rstrip(";")
+            try:
+                yContext = json.loads(yContextStr)
+                self.userId = yContext["guid"]
+            except:                       # userId or crumb not in window.YAHOO.context
+                self.userId = None
+        else:                             # window.YAHOO.context not found
+            self.userId = None
